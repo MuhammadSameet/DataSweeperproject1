@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import os 
+import os
 from io import BytesIO
 
 st.set_page_config(page_title="Data Sweeper", layout="wide")
@@ -8,22 +8,22 @@ st.set_page_config(page_title="Data Sweeper", layout="wide")
 # Custom CSS
 st.markdown(
     """
-  <style>
-  .stApp{
-      background-color: black;
-      color: white;
-  }
-  </style>
+    <style>
+    .stApp {
+        background-color: black;
+        color: white;
+    }
+    </style>
     """,
     unsafe_allow_html=True
 )
 
 # Title & Description
 st.title("Datasweeper Sterling Integrator By Sameet Shahid")
-st.write("Transform your Files between CSV and Excel formats with built-in data cleaning and visualization. Creating the project for Quarter 3!")
+st.write("Transform your files between CSV and Excel formats with built-in data cleaning and visualization. Creating the project for Quarter 3!")
 
 # File Uploader
-uploaded_files = st.file_uploader("Upload your file (accepts CSV or Excel):", type=["csv", "xlsx"], accept_multiple_files=True)
+uploaded_files = st.file_uploader("Upload your file (CSV or Excel):", type=["csv", "xlsx"], accept_multiple_files=True)
 
 if uploaded_files:
     for file in uploaded_files:
@@ -32,13 +32,13 @@ if uploaded_files:
         if file_ext == ".csv":
             df = pd.read_csv(file)
         elif file_ext == ".xlsx":
-            df = pd.read_excel(file)
+            df = pd.read_excel(file, engine="openpyxl")  # Ensure openpyxl is used
         else:
             st.error(f"Unsupported file type: {file_ext}")
             continue
 
         # File Details
-        st.write("Preview the head of the Dataframe")
+        st.write(f"Preview of {file.name}")
         st.dataframe(df.head())
 
         # Data Cleaning Options
@@ -72,14 +72,14 @@ if uploaded_files:
         conversion_type = st.radio(f"Convert {file.name} to:", ["CSV", "Excel"], key=file.name)
 
         if st.button(f"Convert {file.name}"):
-            buffer = BytesIO()
+            buffer = BytesIO()  # Initialize buffer for each file
 
             if conversion_type == "CSV":
                 df.to_csv(buffer, index=False)
                 file_name = os.path.splitext(file.name)[0] + ".csv"
                 mime_type = "text/csv"
             elif conversion_type == "Excel":
-                df.to_excel(buffer, index=False)
+                df.to_excel(buffer, index=False, engine="openpyxl")  # Ensure openpyxl engine
                 file_name = os.path.splitext(file.name)[0] + ".xlsx"
                 mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
